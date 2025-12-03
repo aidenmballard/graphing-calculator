@@ -15,7 +15,7 @@ class Token {
 
     // Defines the possible digits and operations that a token could be
     public static char[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-    public static char[] operations = { '+', '-', '*', '/', '(', ')', '^' };
+    public static char[] operations = { '(', ')', '^', '*', '/', '+', '-' };
 
     // Constructor for the token class
     public Token(String type, String value) {
