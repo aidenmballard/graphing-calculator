@@ -31,17 +31,42 @@ public class Equation {
         while (tokens.size() > 1) {
             Token token = tokens.get(index);
             if (token.type.equals("OPERATION")) {
-                if (token.value.equals("+")) {
-                    tokens.set(index - 1, new Token("NUMBER",
-                            Double.toString(Double.parseDouble(tokens.get(index - 1).value)
-                                    + Double.parseDouble(tokens.get(index + 1).value))));
-                    tokens.remove(index + 1);
-                    tokens.remove(index);
-                }
+                if (token.value.equals(String.valueOf(Token.operations[operationIndex])))
+                    if (token.value.equals("^")) {
+                        tokens.set(index - 1, new Token("NUMBER",
+                                Double.toString(Math.pow(Double.parseDouble(tokens.get(index - 1).value),
+                                        Double.parseDouble(tokens.get(index + 1).value)))));
+                        tokens.remove(index + 1);
+                        tokens.remove(index);
+                    } else if (token.value.equals("*")) {
+                        tokens.set(index - 1, new Token("NUMBER",
+                                Double.toString(Double.parseDouble(tokens.get(index - 1).value)
+                                        * Double.parseDouble(tokens.get(index + 1).value))));
+                        tokens.remove(index + 1);
+                        tokens.remove(index);
+                    } else if (token.value.equals("/")) {
+                        tokens.set(index - 1, new Token("NUMBER",
+                                Double.toString(Double.parseDouble(tokens.get(index - 1).value)
+                                        / Double.parseDouble(tokens.get(index + 1).value))));
+                        tokens.remove(index + 1);
+                        tokens.remove(index);
+                    } else if (token.value.equals("+")) {
+                        tokens.set(index - 1, new Token("NUMBER",
+                                Double.toString(Double.parseDouble(tokens.get(index - 1).value)
+                                        + Double.parseDouble(tokens.get(index + 1).value))));
+                        tokens.remove(index + 1);
+                        tokens.remove(index);
+                    } else if (token.value.equals("-")) {
+                        tokens.set(index - 1, new Token("NUMBER",
+                                Double.toString(Double.parseDouble(tokens.get(index - 1).value)
+                                        - Double.parseDouble(tokens.get(index + 1).value))));
+                        tokens.remove(index + 1);
+                        tokens.remove(index);
+                    }
             }
 
             index++;
-            if (index == tokens.size()) {
+            if (index >= tokens.size()) {
                 index = 0;
                 operationIndex++;
             }
