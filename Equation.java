@@ -24,7 +24,7 @@ public class Equation {
         simplify(tokens);
     }
 
-    public void simplify(List<Token> tokens) {
+    public double simplify(List<Token> tokens) {
         double coefficient = 0;
         int index = 0;
         int operationIndex = 0;
@@ -32,7 +32,18 @@ public class Equation {
             Token token = tokens.get(index);
             if (token.type.equals("OPERATION")) {
                 if (token.value.equals(String.valueOf(Token.operations[operationIndex])))
-                    if (token.value.equals("^")) {
+                    if (token.value.equals("(")) {
+                        int rightParenIndex = 0;
+                        for (Token token2 : tokens)
+                            if (token2.value.equals(")")) {
+                                rightParenIndex = tokens.indexOf(token2);
+                                break;
+                            }
+                        List<Token> subTokens = tokens.subList(index + 1, rightParenIndex);
+                        tokens.set(index + 1, new Token("NUMBER", Double.toString(simplify(subTokens))));
+                    } else if (token.value.equals(")")) {
+
+                    } else if (token.value.equals("^")) {
                         tokens.set(index - 1, new Token("NUMBER",
                                 Double.toString(Math.pow(Double.parseDouble(tokens.get(index - 1).value),
                                         Double.parseDouble(tokens.get(index + 1).value)))));
@@ -70,10 +81,13 @@ public class Equation {
                 index = 0;
                 operationIndex++;
             }
+            if (operationIndex >= Token.operations.length)
+                break;
         }
-        System.out.println(tokens);
+        System.out.println("Printing tokens: " + tokens);
         coefficient = Double.parseDouble(tokens.get(0).value);
         System.out.println(coefficient);
+        return coefficient;
     }
 
     // Prints the equation and the tokens the equation is made up of
