@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Aiden Ballard @ 11/19/2025
  * This class is used to represent an equation, it contains the string
- * of the equation, as well as the token.
+ * of the equation, as well as the tokens.
  */
 public class Equation {
 
@@ -42,7 +42,17 @@ public class Equation {
                         List<Token> subTokens = tokens.subList(index + 1, rightParenIndex);
                         tokens.set(index + 1, new Token("NUMBER", Double.toString(simplify(subTokens))));
                     } else if (token.value.equals(")")) {
-
+                        if (tokens.get(index + 1).type.equals("NUMBER")) {
+                            tokens.set(index + 1, new Token("NUMBER",
+                                    Double.toString(Double.parseDouble(tokens.get(index - 1).value)
+                                            * Double.parseDouble(tokens.get(index + 1).value))));
+                            tokens.remove(index);
+                            tokens.remove(index - 1);
+                            tokens.remove(index - 2);
+                        } else {
+                            tokens.remove(index);
+                            tokens.remove(index - 2);
+                        }
                     } else if (token.value.equals("^")) {
                         tokens.set(index - 1, new Token("NUMBER",
                                 Double.toString(Math.pow(Double.parseDouble(tokens.get(index - 1).value),
