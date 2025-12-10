@@ -3,6 +3,7 @@ package GraphingCalculator.src;
 // Import statements
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 
 /**
  * Aiden Ballard @ 11/19/2025
@@ -14,14 +15,36 @@ public class Equation {
     // Defines the equation and the list of tokens
     public String equation;
     private ArrayList<Token> tokens;
-    private ArrayList<Token> simplifiedTokens = new ArrayList<>();
 
     // Assigns the equation and tokenizes it
     public Equation(String equation) {
         this.equation = equation;
         this.tokens = new Tokenizer().tokenize(equation);
         System.out.println(tokens);
-        simplify(tokens);
+        HashMap<String, Double> variableValues = new HashMap<>();
+        combineLikeTerms();
+    }
+
+    public void combineLikeTerms() {
+        ArrayList<String> variables = new ArrayList<>();
+
+        for (Token token : tokens) {
+            if (token.type.equals("VARIABLE")) {
+                if (tokens.get(tokens.indexOf(token) + 1).type.equals("OPERATION") &&
+                        tokens.get(tokens.indexOf(token) + 1).value.equals("^")) {
+                    String variable = token.value + "^" + tokens.get(tokens.indexOf(token) + 2).value;
+                    if (!variables.contains(variable))
+                        variables.add(variable);
+                } else if (!variables.contains(token.value))
+                    variables.add(token.value);
+            }
+        }
+
+        for (String variable : variables)
+            variableValues.put(variable, 0.0);
+
+        System.out.println("Variables: " + variables);
+
     }
 
     // Simplifies an expression of numbers to one constant
