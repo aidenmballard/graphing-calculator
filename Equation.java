@@ -15,36 +15,50 @@ public class Equation {
     // Defines the equation and the list of tokens
     public String equation;
     private ArrayList<Token> tokens;
+    HashMap<String, Double> variableValues;
 
     // Assigns the equation and tokenizes it
     public Equation(String equation) {
         this.equation = equation;
         this.tokens = new Tokenizer().tokenize(equation);
+        this.variableValues = new HashMap<>();
         System.out.println(tokens);
-        HashMap<String, Double> variableValues = new HashMap<>();
         combineLikeTerms();
     }
 
     public void combineLikeTerms() {
-        ArrayList<String> variables = new ArrayList<>();
+        String variable = "";
 
         for (Token token : tokens) {
             if (token.type.equals("VARIABLE")) {
-                if (tokens.get(tokens.indexOf(token) + 1).type.equals("OPERATION") &&
+                if (tokens.indexOf(token) + 1 < tokens.size()
+                        && tokens.get(tokens.indexOf(token) + 1).type.equals("OPERATION") &&
                         tokens.get(tokens.indexOf(token) + 1).value.equals("^")) {
-                    String variable = token.value + "^" + tokens.get(tokens.indexOf(token) + 2).value;
-                    if (!variables.contains(variable))
-                        variables.add(variable);
-                } else if (!variables.contains(token.value))
-                    variables.add(token.value);
+                    variable = token.value + "^" + tokens.get(tokens.indexOf(token) + 2).value;
+                } else {
+                    variable = token.value;
+                }
+
+                double coefficient = 1.0;
+
+                if (tokens.get(tokens.indexOf(token) - 1).type.equals("NUMBER")) {
+                    coefficient = Double.parseDouble(tokens.get(tokens.indexOf(token) - 1).value);
+                    if (tokens.get(tokens.indexOf(token) - 1).type.equals("OPERATION")
+                            && tokens.get(tokens.indexOf(token) - 1).value.equals("-"))
+                        coefficient *= -1.0;
+                } else if (tokens.get(tokens.indexOf(token) - 1).type.equals("OPERATION")
+                        && tokens.get(tokens.indexOf(token) - 1).value.equals("-")) {
+                    coefficient *= -1.0;
+                }
+
+                if (variableValues.containsKey(variable))
+                    variableValues.put(variable, variableValues.get(variable) + coefficient);
+                else
+                    variableValues.put(variable, coefficient);
             }
         }
 
-        for (String variable : variables)
-            variableValues.put(variable, 0.0);
-
-        System.out.println("Variables: " + variables);
-
+        System.out.println("Combined Like Terms: " + variableValues);
     }
 
     // Simplifies an expression of numbers to one constant
