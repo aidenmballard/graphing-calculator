@@ -3,7 +3,9 @@ package GraphingCalculator.src;
 // Import statements
 import java.util.ArrayList;
 import java.util.List;
-import java.util.HashMap;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.Comparator;
 
 /**
  * Aiden Ballard @ 11/19/2025
@@ -14,19 +16,21 @@ public class Equation {
 
     // Defines the equation and the list of tokens
     public String equation;
+    public String firstDerivative;
     private ArrayList<Token> tokens;
-    HashMap<String, Double> variableValues;
+    public Tokenizer tokenizer = new Tokenizer();
 
     // Assigns the equation and tokenizes it
     public Equation(String equation) {
         this.equation = equation;
-        this.tokens = new Tokenizer().tokenize(equation);
-        this.variableValues = new HashMap<>();
-        System.out.println(tokens);
-        combineLikeTerms();
+        this.tokens = tokenizer.tokenize(equation);
+        this.combineLikeTerms();
+        this.tokens = tokenizer.tokenize(this.equation);
     }
 
     public void combineLikeTerms() {
+        SortedMap<String, Double> variableValues = new TreeMap<>(Comparator.reverseOrder());
+        ArrayList<Token> numbers = new ArrayList();
         String variable = "";
 
         for (Token token : tokens) {
@@ -41,24 +45,40 @@ public class Equation {
 
                 double coefficient = 1.0;
 
-                if (tokens.get(tokens.indexOf(token) - 1).type.equals("NUMBER")) {
+                if (tokens.indexOf(token) - 1 >= 0 && tokens.get(tokens.indexOf(token) - 1).type.equals("NUMBER")) {
                     coefficient = Double.parseDouble(tokens.get(tokens.indexOf(token) - 1).value);
-                    if (tokens.get(tokens.indexOf(token) - 1).type.equals("OPERATION")
-                            && tokens.get(tokens.indexOf(token) - 1).value.equals("-"))
-                        coefficient *= -1.0;
-                } else if (tokens.get(tokens.indexOf(token) - 1).type.equals("OPERATION")
+                    if (tokens.get(tokens.indexOf(token) - 2).type.equals("OPERATION")
+                            && tokens.get(tokens.indexOf(token) - 2).value.equals("-")) {
+                        coefficient *= -1;
+                    }
+                } else if (tokens.indexOf(token) - 1 >= 0
+                        && tokens.get(tokens.indexOf(token) - 1).type.equals("OPERATION")
                         && tokens.get(tokens.indexOf(token) - 1).value.equals("-")) {
-                    coefficient *= -1.0;
+                    coefficient *= -1;
                 }
 
-                if (variableValues.containsKey(variable))
+                if (variableValues.containsKey(variable)) {
                     variableValues.put(variable, variableValues.get(variable) + coefficient);
-                else
+                    if (variableValues.get(variable) == 0)
+                        variableValues.remove(variable);
+                } else
                     variableValues.put(variable, coefficient);
             }
         }
 
-        System.out.println("Combined Like Terms: " + variableValues);
+        String newEquation = "";
+        for (String var : variableValues.keySet()) {
+            double coeff = variableValues.get(var);
+            if (coeff > 0 && !newEquation.isEmpty())
+                newEquation += "+";
+            else if (coeff == -1.0)
+                newEquation += "-";
+            else if (coeff != 1.0)
+                newEquation += coeff;
+            newEquation += var;
+        }
+        this.equation = newEquation;
+        System.out.println("New Equation: " + this.equation);
     }
 
     // Simplifies an expression of numbers to one constant
@@ -157,6 +177,12 @@ public class Equation {
         coefficient = Double.parseDouble(tokens.get(0).value);
         System.out.println(coefficient);
         return coefficient;
+    }
+
+    public String differentiate(String equation) {
+        String derivative = "";
+
+        return derivative;
     }
 
     // Prints the equation and the tokens the equation is made up of
